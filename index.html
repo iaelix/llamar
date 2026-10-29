@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- Página puente de iaelix: abre la llamada al número que va detrás del # (el # nunca se envía a internet). -->
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+<meta name="color-scheme" content="light dark">
+<title>Llamar · iaelix</title>
+<style>
+:root{
+  --bg:#f6f5ff; --card:#ffffff; --fg:#17142b; --muted:#5d5878;
+  --brand:#3305FC; --grad:linear-gradient(135deg,#3305FC 0%,#6a1be8 55%,#9b2bd6 100%);
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#0f0c1e; --card:#1b1730; --fg:#f3f1ff; --muted:#b3add0; --brand:#8f7bff; }
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{min-height:100vh;min-height:100dvh;background:var(--bg);color:var(--fg);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;
+  padding:24px max(16px,env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));text-align:center}
+.logo{font-weight:800;font-size:2.2rem;letter-spacing:-.02em;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.card{width:100%;max-width:440px;background:var(--card);border-radius:20px;padding:28px 20px;display:grid;gap:18px;box-shadow:0 10px 30px rgba(51,5,252,.12)}
+.llamar{display:block;text-decoration:none;background:var(--grad);color:#fff;font-weight:800;font-size:1.6rem;line-height:1.25;
+  padding:22px 16px;border-radius:16px;min-height:88px;overflow-wrap:anywhere}
+.llamar:active{transform:scale(.98)}
+p{margin:0;font-size:1.25rem;line-height:1.4}
+.nota{color:var(--muted);font-size:1.1rem}
+</style>
+</head>
+<body>
+<div class="logo">iaelix</div>
+<main class="card" id="caja">
+  <p>No ha llegado ningún número.</p>
+</main>
+<script>
+(function(){
+  var caja = document.getElementById("caja");
+  function leerNumero(){
+    var h = location.hash.slice(1);
+    try{ h = decodeURIComponent(h); }catch(e){}
+    var n = h.replace(/[^\d+]/g, "");
+    n = n.charAt(0) + n.slice(1).replace(/\+/g, "");   // el + solo puede ir al principio
+    if(n.indexOf("00") === 0) n = "+" + n.slice(2);
+    return n.replace(/\D/g, "").length >= 3 ? n : "";
+  }
+  function pintar(llamarYa){
+    var n = leerNumero();
+    caja.textContent = "";
+    if(!n){
+      var p0 = document.createElement("p"); p0.textContent = "No ha llegado ningún número."; caja.appendChild(p0);
+      return;
+    }
+    var a = document.createElement("a");
+    a.className = "llamar"; a.href = "tel:" + n; a.textContent = "📞 Llamar al " + n;
+    var p = document.createElement("p"); p.className = "nota"; p.textContent = "Cuando termines, vuelve a la app de Claude";
+    caja.appendChild(a); caja.appendChild(p);
+    if(llamarYa) location.href = "tel:" + n;   // intenta abrir la llamada nada más cargar
+  }
+  pintar(true);
+  window.addEventListener("hashchange", function(){ pintar(true); });
+})();
+</script>
+</body>
+</html>
